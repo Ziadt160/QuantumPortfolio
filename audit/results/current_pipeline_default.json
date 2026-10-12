@@ -62,18 +62,18 @@
     "violations": [],
     "qp_objective": -0.06445763431367041,
     "qp_feasible": true,
-    "p_returned_solution": 0.0380859375,
-    "p_feasible": 0.0380859375,
-    "p_optimal": 0.0380859375,
+    "p_returned_solution": 0.0712890625,
+    "p_feasible": 0.0712890625,
+    "p_optimal": 0.0712890625,
     "uniform_p_optimal": 0.03125,
-    "cost_function_evals": 57,
+    "cost_function_evals": 53,
     "optimal_parameters": [
-      1.8091533617138131,
-      1.5022876317410865,
-      1.245027721030202,
-      0.047030156973768895,
-      0.2849134200450191,
-      0.40612145241994785
+      -0.5396145443039286,
+      -0.15869870092816477,
+      -0.18362597336454103,
+      0.2968807910970137,
+      0.5087484316667175,
+      0.604262244038997
     ],
     "gap_to_optimal_pct": 0.0
   },
@@ -1843,7 +1843,9 @@
   "qaoa_config": {
     "reps": 3,
     "cvar_alpha": 0.25,
-    "init": "linear_ramp",
+    "init": "linear_ramp (TQA, Sack & Serbyn 2021, Qiskit sign convention)",
+    "cost_operator_scale": 25.117067645159914,
+    "parameter_units": "\u03b3 for the cost operator divided by cost_operator_scale",
     "optimizer": "COBYLA(maxiter=80)",
     "shots": 1024,
     "seed": 42,
@@ -1868,11 +1870,11 @@
     "risk_model": "PCA factor model, 3 factors (B F B\u1d40 + diag D), annualised \u00d7252"
   },
   "execution_time": {
-    "classical_sec": 0.023629426956176758,
-    "exact_sec": 0.022067785263061523,
-    "sa_sec": 0.030310392379760742,
-    "quantum_sec": 2.624007225036621,
-    "total_sec": 3.648143768310547
+    "classical_sec": 0.016014814376831055,
+    "exact_sec": 0.02064824104309082,
+    "sa_sec": 0.03054070472717285,
+    "quantum_sec": 2.597210168838501,
+    "total_sec": 3.629579544067383
   },
   "_audit": {
     "code": "current",
@@ -1903,7 +1905,7 @@
       "sa_num_sweeps": 1000,
       "seed": 42
     },
-    "wall_sec": 3.648143768310547,
+    "wall_sec": 3.629579544067383,
     "python": "3.11.5"
   }
 }

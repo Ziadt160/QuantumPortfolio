@@ -16,13 +16,32 @@ SMALL_OP = SparsePauliOp.from_list([("IIZZ", 0.7), ("ZIIZ", -0.3), ("IZIZ", 0.2)
 
 def test_linear_ramp_binds_to_the_right_parameters():
     """Regression: the init used to be interleaved [β0, γ0, β1, …] while Qiskit orders [β0..βp-1, γ0..γp-1]."""
-    p, dt = 3, 0.75
+    p, dt, scale = 3, 0.75, 4.0
     ansatz = QAOAAnsatz(SMALL_OP, reps=p)
-    bound = {prm.name: v for prm, v in zip(ansatz.parameters, qm._linear_ramp_initial_point(p, dt))}
+    bound = {prm.name: v for prm, v in zip(ansatz.parameters, qm._linear_ramp_initial_point(p, dt, scale))}
     for i in range(p):
         s = (i + 1) / (p + 1)
-        assert bound[f"β[{i}]"] == pytest.approx((1 - s) * dt)
-        assert bound[f"γ[{i}]"] == pytest.approx(s * dt)
+        assert bound[f"β[{i}]"] == pytest.approx(-(1 - s) * dt)
+        assert bound[f"γ[{i}]"] == pytest.approx(s * dt / scale)
+
+
+def test_linear_ramp_anneals_towards_the_minimum(model):
+    """Regression: with Qiskit's +ΣX mixer, positive β anneals to the *maximum* of H_C.
+
+    The TQA start must have lower ⟨H_C⟩ than the uniform superposition; the
+    original sign/scale gives higher energy than uniform.
+    """
+    from qiskit_optimization.converters import QuadraticProgramToQubo
+    qp = qm._build_quadratic_program(mu=model["mu"], B=model["B"], F=model["F"], D=model["D"],
+                                     asset_metadata=model["md"], **DEFAULT_CFG)
+    op, _ = QuadraticProgramToQubo().convert(qp).to_ising()
+    E = np.real(op.to_matrix(sparse=True).diagonal())
+    scale = np.abs(op.coeffs).max()
+    th = qm._linear_ramp_initial_point(3, energy_scale=scale)
+    e_tqa = np.abs(qaoa_state(E, th[:3], th[3:])) ** 2 @ E
+    s = np.arange(1, 4) / 4
+    wrong = np.abs(qaoa_state(E, (1 - s) * 0.75, s * 0.75 / scale)) ** 2 @ E   # positive-β convention
+    assert e_tqa < E.mean() < wrong
 
 
 def test_ansatz_matches_independent_statevector():
@@ -44,7 +63,7 @@ def test_ansatz_is_unitary_and_trivial_at_zero_angles():
     np.testing.assert_allclose(probs, np.full(16, 1 / 16), atol=1e-12)
 
 
-def test_roundoff_filter_drops_only_roundoff_terms():
+def test_cost_operator_is_cleaned_and_normalised():
     seen = {}
 
     class Recorder(qm.SamplingMinimumEigensolver):
@@ -52,9 +71,12 @@ def test_roundoff_filter_drops_only_roundoff_terms():
             seen["op"] = operator
             return None
 
-    op = SparsePauliOp.from_list([("ZI", 1.5), ("IZ", -3e-17), ("ZZ", 1e-6)])
-    qm._RoundoffFilteredSolver(Recorder()).compute_minimum_eigenvalue(op)
-    assert sorted(seen["op"].paulis.to_labels()) == ["ZI", "ZZ"]
+    op = SparsePauliOp.from_list([("ZI", 1.5), ("IZ", -3e-17), ("ZZ", -3.0)])
+    solver = qm._NormalizedCostSolver(Recorder())
+    solver.compute_minimum_eigenvalue(op)
+    got = dict(zip(seen["op"].paulis.to_labels(), seen["op"].coeffs.real))
+    assert got == pytest.approx({"ZI": 0.5, "ZZ": -1.0})
+    assert solver.scale == 3.0
 
 
 def run_solvers(model, **over):

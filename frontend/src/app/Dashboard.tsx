@@ -16,6 +16,8 @@ const COLORS = ['#0f766e', '#d97706', '#2563eb', '#4f46e5', '#8b5cf6', '#0ea5e9'
 
 // Backend base URL; NEXT_PUBLIC_* values are inlined at build time.
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000';
+// Placeholder size until ResponsiveContainer measures its parent (avoids recharts' width(-1) warnings).
+const CHART_INITIAL_SIZE = { width: 1, height: 1 };
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLLS = 300;
 
@@ -265,7 +267,7 @@ export default function Dashboard() {
             {/* 2x2 Results Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <StrategyCard
-                title="Classical SLSQP" subtitle="Continuous relaxation · SciPy"
+                title="Classical SLSQP" subtitle="Continuous weights · exact durations · SciPy"
                 icon={<BarChart3 className="w-3.5 h-3.5" />}
                 strategy={results?.classical} time={results?.execution_time.classical_sec}
                 accent="slate" />
@@ -275,7 +277,7 @@ export default function Dashboard() {
                 strategy={results?.exact ?? undefined} time={results?.execution_time.exact_sec ?? undefined}
                 accent="emerald" />
               <StrategyCard
-                title="Simulated Annealing" subtitle="dimod · same QUBO · classical heuristic"
+                title="Simulated Annealing" subtitle="dwave-samplers · same QUBO · classical heuristic"
                 icon={<Cpu className="w-3.5 h-3.5" />}
                 strategy={results?.sa} time={results?.execution_time.sa_sec}
                 accent="blue" />
@@ -297,7 +299,7 @@ export default function Dashboard() {
                   <Clock className="w-4 h-4 text-slate-400" /> Out-of-Sample Backtest (2023 → 2024)
                 </h3>
                 <div className="flex-1 min-h-0">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" initialDimension={CHART_INITIAL_SIZE}>
                     <LineChart data={results.backtest_timeseries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                       <XAxis dataKey="date" stroke="#64748b" fontSize={10} tickMargin={10} minTickGap={40} />
@@ -430,7 +432,7 @@ function StrategyCard({ title, subtitle, icon, strategy, time, accent, highlight
         {!strategy ? (
           <div className="absolute inset-0 flex items-center justify-center text-slate-600 italic text-sm">No data</div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" initialDimension={CHART_INITIAL_SIZE}>
             <PieChart>
               <Pie data={formatChartData(strategy.weights)} innerRadius="55%" outerRadius="80%" paddingAngle={2} dataKey="value" stroke="none">
                 {formatChartData(strategy.weights).map((_, i) => (

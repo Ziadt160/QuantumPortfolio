@@ -241,22 +241,32 @@ def discretisation_summary(qp: QuadraticProgram, budget_resolution: int) -> Dict
     return summary
 
 
-class _RoundoffFilteredSolver(SamplingMinimumEigensolver):
+class _NormalizedCostSolver(SamplingMinimumEigensolver):
     """
-    Delegate to `inner` after dropping Pauli terms whose coefficients are
-    floating-point round-off (|c| ≤ rel_tol · max|c|). Such terms appear when
-    QUBO→Ising coefficients cancel exactly in theory; their gates rotate by
-    ~γ·1e-16, and with Qiskit 2.5 their parameter expressions make
-    qiskit-optimization's circuit cache fail with an OverflowError.
+    Delegate to `inner` with the cost operator prepared for QAOA:
+
+    1. drop Pauli terms whose coefficients are floating-point round-off
+       (|c| ≤ rel_tol · max|c|). They appear when QUBO→Ising coefficients
+       cancel exactly in theory; with Qiskit 2.5 their parameter
+       expressions make qiskit-optimization's circuit cache raise
+       OverflowError.
+    2. divide by max|c| so γ is in units where the largest coupling is 1.
+       This only reparametrises γ (ground state, sampled bitstrings and
+       MinimumEigenOptimizer's selection are unchanged); without it the
+       cost phases wrap and COBYLA's O(1) steps are far too large
+       (AUDIT_NUMERICS.md §5).
     """
 
     def __init__(self, inner: SamplingMinimumEigensolver, rel_tol: float = 1e-12):
         self._inner = inner
         self._rel_tol = rel_tol
+        self.scale: float | None = None
 
     def compute_minimum_eigenvalue(self, operator, aux_operators=None):
         scale = float(np.max(np.abs(operator.coeffs))) if len(operator) else 0.0
-        return self._inner.compute_minimum_eigenvalue(operator.simplify(atol=self._rel_tol * scale), aux_operators)
+        operator = operator.simplify(atol=self._rel_tol * scale)
+        self.scale = scale if scale > 0 else 1.0
+        return self._inner.compute_minimum_eigenvalue(operator / self.scale, aux_operators)
 
     @classmethod
     def supports_aux_operators(cls) -> bool:
@@ -265,21 +275,31 @@ class _RoundoffFilteredSolver(SamplingMinimumEigensolver):
         return True
 
 
-def _linear_ramp_initial_point(reps: int, dt: float = 0.75) -> np.ndarray:
+def _linear_ramp_initial_point(reps: int, dt: float = 0.75, energy_scale: float = 1.0) -> np.ndarray:
     """
-    Linear-ramp (TQA-style, Sack & Serbyn 2021) starting point for QAOA:
-    γ_i = s_i·dt increasing, β_i = (1 − s_i)·dt decreasing, s_i = (i+1)/(p+1).
+    Trotterised-quantum-annealing (TQA) starting point for QAOA, after
+    Sack & Serbyn (Quantum 5, 491, 2021, Eq. 6), translated to Qiskit's
+    conventions:
 
-    The returned layout is [β_0..β_{p-1}, γ_0..γ_{p-1}], which is the order
-    of QAOAAnsatz.parameters (Qiskit sorts parameters by name, "β" < "γ").
-    An interleaved layout would bind the values to the wrong parameters.
+      γ_i =  s_i · dt / energy_scale       (increasing)
+      β_i = −(1 − s_i) · dt                (|β| decreasing),  s_i = (i+1)/(p+1)
 
-    dt = 0.75 is the value Sack & Serbyn report for unit-weight MaxCut; it is
-    not calibrated to this Hamiltonian's energy scale.
+    * Layout: [β_0..β_{p-1}, γ_0..γ_{p-1}], the order of
+      QAOAAnsatz.parameters (Qiskit sorts by name, "β" < "γ").
+    * Sign: Sack & Serbyn anneal with mixer H_B = −ΣX, whose ground state
+      is |+⟩^n. Qiskit applies e^{−iβΣX} (H_B = +ΣX), for which |+⟩^n is
+      the *highest* state, so β must be negative for the schedule to anneal
+      towards the minimum of H_C (positive β, γ anneal towards its maximum).
+    * Scale: dt ≈ 0.75 is calibrated for unit-coupling MaxCut Hamiltonians.
+      optimize_portfolio_qaoa normalises the cost operator to max|c| = 1, so
+      energy_scale stays 1 there; pass the largest |Pauli coefficient| when
+      using an unnormalised operator.
+    * s_i = (i+1)/(p+1) rather than the paper's i/p, so the last mixer
+      layer is not zero.
     """
     s = np.arange(1, reps + 1) / (reps + 1)
-    betas = (1 - s) * dt
-    gammas = s * dt
+    betas = -(1 - s) * dt
+    gammas = s * dt / energy_scale
     return np.concatenate([betas, gammas])
 
 
@@ -473,7 +493,7 @@ def optimize_portfolio_qaoa(
     # do not transpile); this changes gate decomposition, not the unitary.
     pass_manager = generate_preset_pass_manager(optimization_level=1, backend=AerSimulator(**backend_options))
     optimizer = COBYLA(maxiter=qaoa_maxiter)
-    initial_point = _linear_ramp_initial_point(qaoa_reps)
+    initial_point = _linear_ramp_initial_point(qaoa_reps)  # cost operator is normalised below
     qaoa = QAOA(
         sampler=sampler,
         optimizer=optimizer,
@@ -482,7 +502,8 @@ def optimize_portfolio_qaoa(
         aggregation=qaoa_cvar_alpha,  # CVaR-α (Barkoutsos et al. 2020)
         pass_manager=pass_manager,
     )
-    meo = MinimumEigenOptimizer(_RoundoffFilteredSolver(qaoa))
+    prepared = _NormalizedCostSolver(qaoa)
+    meo = MinimumEigenOptimizer(prepared)
     t0 = time.time()
     qaoa_res = meo.solve(qp)
     qaoa_time = time.time() - t0
@@ -540,7 +561,9 @@ def optimize_portfolio_qaoa(
         "qaoa_config": {
             "reps": qaoa_reps,
             "cvar_alpha": qaoa_cvar_alpha,
-            "init": "linear_ramp",
+            "init": "linear_ramp (TQA, Sack & Serbyn 2021, Qiskit sign convention)",
+            "cost_operator_scale": prepared.scale,
+            "parameter_units": "γ for the cost operator divided by cost_operator_scale",
             "optimizer": f"COBYLA(maxiter={qaoa_maxiter})",
             "shots": qaoa_shots,
             "seed": seed,

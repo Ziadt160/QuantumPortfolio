@@ -215,7 +215,7 @@ def main() -> None:
     feas_code = [tuple(x) for x in grid if qp.is_feasible(x.astype(float))]
     record("N10", "Number of feasible portfolios (dashboard defaults)", len(feas_code), len(feas_ref), 0,
            "hand enumeration of budget/duration/sector/bounds",
-           note=f"feasible x = {[dict((tickers[i], v) for i, v in enumerate(f) if v) for f in feas_ref]}")
+           note=f"feasible x = {[dict((tickers[i], int(v)) for i, v in enumerate(f) if v) for f in feas_ref]}")
     if feas_code != feas_ref:
         CHECKS[-1]["status"] = "FAIL"
 
@@ -271,7 +271,7 @@ def main() -> None:
 
     kstar = int(np.argmin(E_ref))
     x_star = decoded[kstar]
-    exact_w = {t: x_star[i] / 2 for i, t in enumerate(tickers) if x_star[i]}
+    exact_w = {t: float(x_star[i] / 2) for i, t in enumerate(tickers) if x_star[i]}
     record("N15", "Exact optimum weights (Exact solver, original & current)", str(cur["exact"]["weights"]), str(exact_w),
            None, "argmin over all 2^n QUBO energies (brute force)",
            status="PASS" if cur["exact"]["weights"] == exact_w == orig["exact"]["weights"] else "FAIL")
@@ -365,19 +365,33 @@ def main() -> None:
     order = [prm.name for prm in QAOAAnsatz(op, reps=p).parameters]
     record("N24", "Qiskit QAOA parameter order", ", ".join(order), "β[0..p-1], γ[0..p-1] (block)", None,
            "QAOAAnsatz(op, reps=3).parameters", status="INFO")
+    scale = float(np.max(np.abs(op.coeffs)))
+    # original code: raw operator; current code: operator normalised to max|c| = 1 (_NormalizedCostSolver)
     ip_orig, ip_cur = oqm._linear_ramp_initial_point(p), qm._linear_ramp_initial_point(p)
-    mono = lambda v: bool(np.all(np.diff(v[:p]) < 0) and np.all(np.diff(v[p:]) > 0))  # noqa: E731
-    record("N25.o", "original: linear-ramp init binds β decreasing, γ increasing",
-           f"β={np.round(ip_orig[:p], 4).tolist()}, γ={np.round(ip_orig[p:], 4).tolist()}", "monotone ramps", None,
-           "values as bound in Qiskit's block order", status="PASS" if mono(ip_orig) else "FAIL")
-    record("N25.c", "current: linear-ramp init binds β decreasing, γ increasing",
-           f"β={np.round(ip_cur[:p], 4).tolist()}, γ={np.round(ip_cur[p:], 4).tolist()}", "monotone ramps", None,
-           "values as bound in Qiskit's block order", status="PASS" if mono(ip_cur) else "FAIL")
+    E_raw = np.real(op.to_matrix(sparse=True).diagonal())
+    E_norm = E_raw / scale
 
-    theta = np.array(cur["quantum"]["optimal_parameters"])
-    E_ising = np.real(op.to_matrix(sparse=True).diagonal())
-    psi_np = numpy_qaoa_state(E_ising, theta[:p], theta[p:])
-    psi_qk = Statevector(QAOAAnsatz(op, reps=p).assign_parameters(theta)).data
+    def tqa_ok(v, E_ising_):
+        # Qiskit's mixer is +ΣX, so TQA needs β ≤ 0 with |β| decreasing, γ ≥ 0 increasing,
+        # and the start state must have lower energy than the uniform superposition.
+        e = float(np.abs(numpy_qaoa_state(E_ising_, v[:p], v[p:])) ** 2 @ E_ising_)
+        shape = bool(np.all(v[:p] <= 0) and np.all(np.diff(np.abs(v[:p])) < 0) and np.all(np.diff(v[p:]) > 0))
+        return shape and e < E_ising_.mean(), e
+
+    ok_o, e_o = tqa_ok(ip_orig, E_raw)
+    ok_c, e_c = tqa_ok(ip_cur, E_norm)
+    record("N25.o", "original: init is a TQA linear ramp (Sack & Serbyn Eq. 6) in Qiskit's convention",
+           f"β={np.round(ip_orig[:p], 4).tolist()}, γ={np.round(ip_orig[p:], 4).tolist()}",
+           "β≤0, |β|↓, γ↑, ⟨H⟩ < uniform", None, "values as bound in Qiskit's block order; ⟨H⟩ by NumPy statevector",
+           status="PASS" if ok_o else "FAIL", note=f"raw H: ⟨H⟩ at init {e_o:+.3f} vs uniform {E_raw.mean():+.3f}")
+    record("N25.c", "current: init is a TQA linear ramp (Sack & Serbyn Eq. 6) in Qiskit's convention",
+           f"β={np.round(ip_cur[:p], 4).tolist()}, γ={np.round(ip_cur[p:], 4).tolist()}",
+           "β≤0, |β|↓, γ↑, ⟨H⟩ < uniform", None, "values as bound in Qiskit's block order; ⟨H⟩ by NumPy statevector",
+           status="PASS" if ok_c else "FAIL", note=f"H/max|c| (max|c| = {scale:.3g}): ⟨H⟩ at init {e_c:+.3f} vs uniform {E_norm.mean():+.3f}")
+
+    theta = np.array(cur["quantum"]["optimal_parameters"])  # parameters of the normalised operator
+    psi_np = numpy_qaoa_state(E_norm, theta[:p], theta[p:])
+    psi_qk = Statevector(QAOAAnsatz(op / scale, reps=p).assign_parameters(theta)).data
     pr_np, pr_qk = np.abs(psi_np) ** 2, np.abs(psi_qk) ** 2
     record("N26", "QAOA state probabilities: NumPy vs Qiskit Statevector (max |Δp|)", float(np.max(np.abs(pr_np - pr_qk))),
            0.0, 1e-10, "independent NumPy simulation of e^{-iβΣX}e^{-iγH_C} layers",
@@ -393,8 +407,8 @@ def main() -> None:
     record("N28", "uniform_p_optimal (random guessing)", cur["quantum"]["uniform_p_optimal"], opt_states.mean(), 1e-15,
            f"{int(opt_states.sum())} of {2 ** n} bitstrings decode to x* (slack bits are free)")
 
-    for tag, ip in (("original init", ip_orig), ("intended/current init", ip_cur)):
-        pr = np.abs(numpy_qaoa_state(E_ising, ip[:p], ip[p:])) ** 2
+    for tag, ip, Eh in (("original init", ip_orig, E_raw), ("current (corrected) init", ip_cur, E_norm)):
+        pr = np.abs(numpy_qaoa_state(Eh, ip[:p], ip[p:])) ** 2
         record(f"N29.{tag[:4]}", f"P(x*) of the QAOA state at the {tag}", float(pr[opt_states].sum()), opt_states.mean(),
                None, "NumPy statevector; verified value column = uniform baseline", status="INFO")
     record("N30", "P(x*) of the QAOA state at optimised θ* (exact)", p_opt_exact, opt_states.mean(), None,
@@ -410,6 +424,23 @@ def main() -> None:
            f"Monte Carlo ({trials} trials) vs 1−(1−u)^N", note=f"1 − P = {(1 - u) ** shots:.2e}: random sampling 'finds' x* essentially always")
     record("N32", "QAOA: P(x* appears in the final 1024-shot histogram)", 1 - (1 - p_opt_exact) ** shots, analytic, None,
            "1−(1−p)^N with exact p at θ*; verified column = null model", status="INFO")
+
+    # CVaR aggregation used by QAOA (library function) vs an independent quantile-integral definition
+    from qiskit_optimization.minimum_eigensolvers.diagonal_estimator import _get_cvar_aggregation
+    rng_c = np.random.default_rng(7)
+    worst_cvar = 0.0
+    for _ in range(200):
+        k = int(rng_c.integers(2, 40)); vals = rng_c.normal(size=k); probs = rng_c.dirichlet(np.ones(k))
+        alpha = float(rng_c.uniform(0.01, 1.0))
+        order = np.argsort(vals); v, pr_ = vals[order], probs[order]
+        grid_u = (np.arange(200_000) + 0.5) / 200_000 * alpha         # midpoint rule on (0, α)
+        quant = v[np.minimum(np.searchsorted(np.cumsum(pr_), grid_u, side="right"), k - 1)]
+        ref = float(quant.mean())                                      # (1/α)∫_0^α F⁻¹(u) du
+        got = _get_cvar_aggregation(alpha)(list(zip(probs, vals)))
+        worst_cvar = max(worst_cvar, abs(got - ref))
+    record("N34", "CVaR_α aggregation (200 random discrete distributions, max |Δ|)", worst_cvar, 0.0, 1e-4,
+           "(1/α)∫₀^α F⁻¹(u)du by midpoint rule (2·10⁵ nodes); Barkoutsos et al. 2020 definition",
+           note="tolerance set by the quadrature, not by the library")
 
     # ---------------- E. timing context ----------------------------------
     t0 = time.perf_counter()

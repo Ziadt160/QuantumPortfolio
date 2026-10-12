@@ -12,8 +12,9 @@ For the null model (sample N uniform bitstrings, return the best feasible one,
 which is exactly MinimumEigenOptimizer's selection rule) the success
 probability is 1 − (1 − u)^N with u = (#bitstrings decoding to x*) / 2^n.
 
-`--init original` reproduces the original interleaved initial point (the
-β/γ ordering defect) inside the current code, to isolate its effect.
+`--init original` reproduces the original initial point (interleaved β/γ
+order, positive β, no energy scaling) inside the current code, to isolate
+the effect of the initial-point corrections.
 
 Usage (repo root):
   python audit/qaoa_study.py --configs C1,C2 --seeds 20 --out audit/results/qaoa_study_9q.jsonl
@@ -22,7 +23,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import sys
 import time
 from pathlib import Path
@@ -45,8 +45,8 @@ CONFIGS = {
 }
 
 
-def original_interleaved_init(reps: int, dt: float = 0.75) -> np.ndarray:
-    """The initial point exactly as the original code built it ([β0, γ0, β1, γ1, ...])."""
+def original_interleaved_init(reps: int, dt: float = 0.75, energy_scale: float = 1.0) -> np.ndarray:
+    """The initial point exactly as the original code built it ([β0, γ0, β1, γ1, ...], β > 0, unscaled)."""
     params = np.empty(2 * reps, dtype=float)
     for i in range(reps):
         s = (i + 1) / (reps + 1)
@@ -70,7 +70,10 @@ def problem_objects(cfg):
     M = np.array([np.asarray(conv.interpret(np.eye(n)[j]), dtype=float) for j in range(n)])
     assert np.allclose(np.asarray(conv.interpret(np.zeros(n)), dtype=float), 0)
     op, _ = qubo.to_ising()
-    return dict(mu=mu, B=B, F=F, D=D, md=md, qp=qp, n=n, M=M, E=np.real(op.to_matrix(sparse=True).diagonal()))
+    scale = float(np.max(np.abs(op.coeffs)))
+    # QAOA runs on the operator normalised to max|c| = 1 (quantum_engine._NormalizedCostSolver)
+    return dict(mu=mu, B=B, F=F, D=D, md=md, qp=qp, n=n, M=M,
+                E=np.real(op.to_matrix(sparse=True).diagonal()) / scale, scale=scale)
 
 
 def main() -> None:

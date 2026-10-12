@@ -117,7 +117,7 @@
     "tolerance": "abs \u2264 0",
     "method": "hand enumeration of budget/duration/sector/bounds",
     "status": "PASS",
-    "note": "feasible x = [{'AAPL': np.int64(1), 'GS': np.int64(1)}]"
+    "note": "feasible x = [{'AAPL': 1, 'GS': 1}]"
   },
   {
     "id": "N11",
@@ -171,7 +171,7 @@
     "id": "N15",
     "claim": "Exact optimum weights (Exact solver, original & current)",
     "reported": "{'AAPL': 0.5, 'GS': 0.5}",
-    "verified": "{'AAPL': np.float64(0.5), 'GS': np.float64(0.5)}",
+    "verified": "{'AAPL': 0.5, 'GS': 0.5}",
     "abs_err": null,
     "rel_err": null,
     "tolerance": "n/a",
@@ -685,51 +685,51 @@
   },
   {
     "id": "N25.o",
-    "claim": "original: linear-ramp init binds \u03b2 decreasing, \u03b3 increasing",
+    "claim": "original: init is a TQA linear ramp (Sack & Serbyn Eq. 6) in Qiskit's convention",
     "reported": "\u03b2=[0.5625, 0.1875, 0.375], \u03b3=[0.375, 0.1875, 0.5625]",
-    "verified": "monotone ramps",
+    "verified": "\u03b2\u22640, |\u03b2|\u2193, \u03b3\u2191, \u27e8H\u27e9 < uniform",
     "abs_err": null,
     "rel_err": null,
     "tolerance": "n/a",
-    "method": "values as bound in Qiskit's block order",
+    "method": "values as bound in Qiskit's block order; \u27e8H\u27e9 by NumPy statevector",
     "status": "FAIL",
-    "note": ""
+    "note": "raw H: \u27e8H\u27e9 at init +9.908 vs uniform +0.000"
   },
   {
     "id": "N25.c",
-    "claim": "current: linear-ramp init binds \u03b2 decreasing, \u03b3 increasing",
-    "reported": "\u03b2=[0.5625, 0.375, 0.1875], \u03b3=[0.1875, 0.375, 0.5625]",
-    "verified": "monotone ramps",
+    "claim": "current: init is a TQA linear ramp (Sack & Serbyn Eq. 6) in Qiskit's convention",
+    "reported": "\u03b2=[-0.5625, -0.375, -0.1875], \u03b3=[0.1875, 0.375, 0.5625]",
+    "verified": "\u03b2\u22640, |\u03b2|\u2193, \u03b3\u2191, \u27e8H\u27e9 < uniform",
     "abs_err": null,
     "rel_err": null,
     "tolerance": "n/a",
-    "method": "values as bound in Qiskit's block order",
+    "method": "values as bound in Qiskit's block order; \u27e8H\u27e9 by NumPy statevector",
     "status": "PASS",
-    "note": ""
+    "note": "H/max|c| (max|c| = 25.1): \u27e8H\u27e9 at init -1.468 vs uniform +0.000"
   },
   {
     "id": "N26",
     "claim": "QAOA state probabilities: NumPy vs Qiskit Statevector (max |\u0394p|)",
-    "reported": 1.3600232051658168e-15,
+    "reported": 4.926614671774132e-16,
     "verified": 0.0,
-    "abs_err": 1.3600232051658168e-15,
+    "abs_err": 4.926614671774132e-16,
     "rel_err": null,
     "tolerance": "abs \u2264 1e-10",
     "method": "independent NumPy simulation of e^{-i\u03b2\u03a3X}e^{-i\u03b3H_C} layers",
     "status": "PASS",
-    "note": "\u03a3p = 1.000000000000001; \u2016\u03c8\u2016 \u2212 1 = 4.4e-16"
+    "note": "\u03a3p = 0.999999999999999; \u2016\u03c8\u2016 \u2212 1 = 4.4e-16"
   },
   {
     "id": "N27",
     "claim": "current: p_optimal from 1024 Aer shots vs exact |\u03c8|\u00b2 at reported \u03b8*",
-    "reported": 0.0380859375,
-    "verified": 0.031064601878612392,
-    "abs_err": 0.007021335621387608,
-    "rel_err": 0.22602367958308567,
-    "tolerance": "abs \u2264 0.0216865",
+    "reported": 0.0712890625,
+    "verified": 0.0783817624126451,
+    "abs_err": 0.007092699912645106,
+    "rel_err": 0.0904891609263032,
+    "tolerance": "abs \u2264 0.0335964",
     "method": "binomial: accept |\u0394| \u2264 4\u03c3, \u03c3=\u221a(p(1\u2212p)/N)",
     "status": "PASS",
-    "note": "\u03c3 = 0.0054, z = +1.30"
+    "note": "\u03c3 = 0.0084, z = -0.84"
   },
   {
     "id": "N28",
@@ -756,12 +756,12 @@
     "note": ""
   },
   {
-    "id": "N29.inte",
-    "claim": "P(x*) of the QAOA state at the intended/current init",
-    "reported": 0.014320596806556025,
+    "id": "N29.curr",
+    "claim": "P(x*) of the QAOA state at the current (corrected) init",
+    "reported": 0.07278506075806762,
     "verified": 0.03125,
-    "abs_err": 0.016929403193443975,
-    "rel_err": 0.5417409021902072,
+    "abs_err": 0.04153506075806762,
+    "rel_err": 1.3291219442581639,
     "tolerance": "n/a",
     "method": "NumPy statevector; verified value column = uniform baseline",
     "status": "INFO",
@@ -770,14 +770,14 @@
   {
     "id": "N30",
     "claim": "P(x*) of the QAOA state at optimised \u03b8* (exact)",
-    "reported": 0.031064601878612392,
+    "reported": 0.0783817624126451,
     "verified": 0.03125,
-    "abs_err": 0.0001853981213876081,
-    "rel_err": 0.0059327398844034596,
+    "abs_err": 0.047131762412645106,
+    "rel_err": 1.5082163972046434,
     "tolerance": "n/a",
     "method": "NumPy statevector; verified value column = uniform baseline",
     "status": "INFO",
-    "note": "ratio to uniform = 0.99\u00d7"
+    "note": "ratio to uniform = 2.51\u00d7"
   },
   {
     "id": "N31",
@@ -794,25 +794,37 @@
   {
     "id": "N32",
     "claim": "QAOA: P(x* appears in the final 1024-shot histogram)",
-    "reported": 0.9999999999999908,
+    "reported": 1.0,
     "verified": 0.9999999999999925,
-    "abs_err": 1.6653345369377348e-15,
-    "rel_err": 1.6653345369377474e-15,
+    "abs_err": 7.549516567451064e-15,
+    "rel_err": 7.549516567451121e-15,
     "tolerance": "n/a",
     "method": "1\u2212(1\u2212p)^N with exact p at \u03b8*; verified column = null model",
     "status": "INFO",
     "note": ""
   },
   {
+    "id": "N34",
+    "claim": "CVaR_\u03b1 aggregation (200 random discrete distributions, max |\u0394|)",
+    "reported": 4.907395291464667e-06,
+    "verified": 0.0,
+    "abs_err": 4.907395291464667e-06,
+    "rel_err": null,
+    "tolerance": "abs \u2264 0.0001",
+    "method": "(1/\u03b1)\u222b\u2080^\u03b1 F\u207b\u00b9(u)du by midpoint rule (2\u00b710\u2075 nodes); Barkoutsos et al. 2020 definition",
+    "status": "PASS",
+    "note": "tolerance set by the quadrature, not by the library"
+  },
+  {
     "id": "N33",
     "claim": "Wall-clock: exhaustive NumPy evaluation of all 512 QUBO energies [s]",
-    "reported": 0.022067785263061523,
-    "verified": 0.0003083169995807111,
-    "abs_err": 0.02175946826348081,
-    "rel_err": 70.57498708495515,
+    "reported": 0.02064824104309082,
+    "verified": 0.00030246500158682466,
+    "abs_err": 0.020345776041503994,
+    "rel_err": 67.26654632689329,
     "tolerance": "n/a",
     "method": "vectorised einsum; reported column = Exact solver time, current run",
     "status": "INFO",
-    "note": "QAOA: 2.62s for 57 evaluations \u00d7 1024 shots; SA 0.030s; original SA (dimod reference) 5.13s"
+    "note": "QAOA: 2.60s for 53 evaluations \u00d7 1024 shots; SA 0.031s; original SA (dimod reference) 5.13s"
   }
 ]
