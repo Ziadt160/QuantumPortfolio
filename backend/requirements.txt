@@ -1,0 +1,16 @@
+# Runtime dependencies, pinned to the versions the audit tested (see AUDIT_TESTING.md).
+# Tested on CPython 3.11 and 3.13 (Windows 11).
+# qiskit-algorithms is intentionally absent: its 0.4 release dropped V1-primitive
+# support and broke the original code; QAOA now comes from qiskit-optimization.
+fastapi==0.143.0
+pydantic==2.14.1
+uvicorn==0.54.0
+yfinance==1.7.0
+numpy==2.4.6
+pandas==3.0.6
+scipy==1.17.1
+qiskit==2.5.2
+qiskit-optimization==0.7.0
+qiskit-aer==0.17.2
+dimod==0.12.22
+dwave-samplers==1.8.0
