@@ -33,7 +33,7 @@ require.
 | Resource management | **Meets** | Task store bounded at 100 entries (FIFO). No files or sockets held open. Simulation memory bounded by the qubit cap. |
 | External services | **Partial** | Yahoo Finance via the unofficial `yfinance` client: no retry/backoff, no caching, subject to rate limits and Yahoo's terms. Failures surface as task errors. Results change over time (adjusted-price revisions), so the frozen snapshot is the reproducibility reference. |
 | Data licensing | **Owner decision** | `audit/data/*.csv` (Yahoo-derived prices) is now committed in the owner's repository. Check Yahoo's terms before publishing the repository publicly; the audit scripts can re-download it (`fetch_universe_data`). |
-| Deployment workflow | **Absent** | No Dockerfile, CI, process manager or release process. `main.py`'s `__main__` uses `reload=True` (development only). |
+| Deployment workflow | **Partial** | GitHub Actions CI was added after the audit (`.github/workflows/ci.yml`: backend tests on Python 3.11/3.13 on Linux, frontend type-check/lint/build, informational `pip-audit`/`npm audit`). Still no Dockerfile, process manager or release process. `main.py`'s `__main__` uses `reload=True` (development only). |
 | Scientific honesty in the product | **Meets after fixes** | The UI no longer fabricates progress, reports feasible-portfolio counts, P(optimum) vs random, solver non-convergence and constraint violations, and does not attribute the penalty method to Barkoutsos. |
 
 ## 3. Changes made in this phase

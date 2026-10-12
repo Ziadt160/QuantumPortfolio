@@ -9,7 +9,8 @@ baselines, and independently verified.**
 ![Qiskit](https://img.shields.io/badge/Qiskit-2.5-6929C4?logo=qiskit&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.143-009688?logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16.4-000000?logo=nextdotjs&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-50%20passing%20(local)-2ea44f)
+[![CI](https://github.com/Ziadt160/QuantumPortfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Ziadt160/QuantumPortfolio/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ![Dashboard](docs/images/dashboard.png)
 
@@ -212,6 +213,7 @@ the effective discretised constraints. The interactive schema is at `/docs`.
 | Stochastic study | Repeated QAOA trials with confidence intervals vs SA and a null model | `python audit/qaoa_study.py` (see below) |
 | Mutation check | Re-introduces each fixed defect and confirms its test fails (7/7) | `python audit/mutate.py <dir> <python>` |
 | Frontend | Type-check, lint, production build, browser run | `npx tsc --noEmit`, `npm run lint`, `npm run build` |
+| Continuous integration | Every push and pull request: backend tests on Python 3.11 and 3.13 (Linux), frontend type-check/lint/build, dependency audit | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 
 <details>
 <summary><b>Reproducing the audit</b></summary>
@@ -276,7 +278,8 @@ QuantumPortfolio/
 - [ ] Remove redundant constraint slack qubits (9 → 6 qubits at the defaults)
 - [ ] Noisy simulation and a run on IBM Quantum hardware via Qiskit Runtime
 - [ ] Equal-budget benchmark of QAOA vs simulated annealing over many instances and sizes
-- [ ] Continuous integration (tests, lint, `pip-audit`, `npm audit`) and typed API response models
+- [x] Continuous integration (tests on Python 3.11/3.13, frontend checks, `pip-audit`, `npm audit`)
+- [ ] Typed API response models and a Python linter (ruff) in CI
 
 ## References
 
@@ -287,3 +290,7 @@ QuantumPortfolio/
    Quantum 5, 491 (2021).
 4. A. Lucas. *Ising formulations of many NP problems.* Frontiers in Physics 2, 5 (2014).
 5. F. Glover, G. Kochenberger, Y. Du. *A Tutorial on Formulating and Using QUBO Models.* arXiv:1811.11538 (2019).
+
+## License
+
+Released under the [MIT License](LICENSE).

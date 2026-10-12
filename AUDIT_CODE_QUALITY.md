@@ -59,7 +59,7 @@ are only made where they have a concrete benefit.
 ## 5. Prioritised recommendations
 
 1. Response models (pydantic) for the API, with a generated TypeScript type for the UI.
-2. (Git now exists.) Add CI that runs `pytest -m "not slow"`, `ruff check`, `tsc`, `eslint`.
+2. Done after the audit: CI (`.github/workflows/ci.yml`) runs the tests, `tsc`, `eslint`, `pip-audit` and `npm audit`. Still to add: `ruff`. Originally recommended: CI that runs `pytest -m "not slow"`, `ruff check`, `tsc`, `eslint`.
 3. Split `optimize_portfolio_qaoa` into one function per solver.
 4. Add a Python formatter/linter configuration (ruff) and optionally mypy with `--ignore-missing-imports`.
 5. Move the metadata table into a data file with sources (R2 in AUDIT_CORRECTNESS.md).
