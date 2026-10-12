@@ -1,7 +1,7 @@
 # Audit summary — QuantumPortfolio (2026-10-12)
 
 Full evidence is in the phase documents; every number below was produced by scripts in `audit/` or by the test
-suite and can be re-run (README "Reproducing the audit").
+suite and can be re-run (README, "Reproducing the audit" under "Testing and verification").
 
 ## Verdicts on the eight objectives
 
@@ -51,5 +51,5 @@ suite and can be re-run (README "Reproducing the audit").
 ## Not verified
 
 Bank ratios and equity durations against filings; Yahoo price correctness beyond internal consistency; any
-hardware or noisy-simulation behaviour; QAOA beyond 18 qubits or other p/α; the UI at phone widths and its
-accessibility (desktop rendering was checked in Chrome); Linux and macOS. The audit brief was truncated in Phase 7, so later requirements could not be addressed.
+hardware or noisy-simulation behaviour; QAOA beyond 18 qubits or other p/α; the UI's accessibility (rendering was
+checked in Chrome at desktop and phone width); Linux and macOS. The audit brief was truncated in Phase 7, so later requirements could not be addressed.

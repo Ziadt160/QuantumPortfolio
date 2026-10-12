@@ -235,4 +235,4 @@ claimed or supported.**
 | Hardware or noisy-simulation behaviour | Not implemented in the project. |
 | QAOA behaviour for n > 18, p ≠ 3, other α | Not studied. |
 | Exact P(optimum) of the *original* run | The original code does not return its optimised parameters. |
-| Frontend rendering at phone widths, accessibility | Desktop rendering was checked in Chrome (AUDIT_TESTING.md §4); narrow widths and accessibility were not. |
+| Frontend accessibility | Rendering was checked in Chrome at desktop and phone width (AUDIT_TESTING.md §4); accessibility was not. |

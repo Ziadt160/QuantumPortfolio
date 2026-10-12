@@ -53,7 +53,8 @@ are only made where they have a concrete benefit.
   `node_modules/next/dist/docs/01-app/02-guides/environment-variables.md`), defaulting to `http://localhost:8000`.
 * Rendered and exercised in Chrome at desktop width (AUDIT_TESTING.md §4). That check found and fixed a stale
   SA label, an inaccurate SLSQP label and pre-existing Recharts `width(-1)` console warnings.
-* Not reviewed: accessibility (slider labels are not programmatically associated with inputs) and phone-width layout.
+* Phone width (390 px) checked headlessly; the header overflowed and now stacks on small screens.
+* Not reviewed: accessibility (slider labels are not programmatically associated with inputs).
 
 ## 5. Prioritised recommendations
 

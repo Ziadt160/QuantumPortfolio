@@ -157,7 +157,7 @@ export default function Dashboard() {
 
       <div className="relative z-10 max-w-[1400px] mx-auto p-6 space-y-8">
         {/* Header */}
-        <header className="flex items-center justify-between pb-6 border-b border-slate-800">
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-6 border-b border-slate-800">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 shadow-xl">
               <BrainCircuit className="w-7 h-7 text-amber-500" />
@@ -172,7 +172,7 @@ export default function Dashboard() {
             </div>
           </div>
           {results && (
-            <div className="flex gap-3 text-xs">
+            <div className="flex flex-wrap gap-3 text-xs">
               <Stat label="Qubits"      value={String(results.qubo.num_qubits)} />
               <Stat label="Vars"        value={String(results.qubo.num_integer_vars)} />
               <Stat label="Constraints" value={String(results.qubo.num_constraints)} />

@@ -67,7 +67,7 @@ its regression test re-run.
 | **Clean** venv, CPython 3.11.5 (Anaconda base), `pip install --no-cache-dir -r requirements-dev.txt` | `python -m pytest` | **50 passed** in 32.9 s; `pip check`: no broken requirements; installed versions equal the pins |
 | **Clean** venv, CPython 3.13.5 (author's interpreter, new venv) | same | **50 passed** in 36.2 s; `pip check` clean. Lock differs only by networkx 3.7 (3.6.1 on 3.11) and setuptools. |
 | Frontend (Node 22.19.0) | `npx tsc --noEmit -p .`; `npm run lint`; `npm run build` | 0 type errors; 0 lint findings; production build succeeded on Next 16.2.4 and again after the upgrade to 16.4.0 (Turbopack). |
-| Browser (Chrome + Claude extension) | dev servers on :8000/:3000, click Run | Browser check (2026-10-12, Chrome via the Claude extension, 1568×760 window, live data): page loads with every request 200; Run completes (POST `/api/optimize` 200, task polls 200); all four cards, the "Feasible 1" chip, real status messages, "P(optimum) 7.1 % vs 3.1 % random" and the backtest render without clipping. Fixed during the check: stale "dimod" label on the SA card, "Continuous relaxation" wording on the SLSQP card, and 10 Recharts `width(-1)` console warnings (pre-existing; `initialDimension` set). After the fixes the console shows no errors or warnings. Not checked: phone-width layout (the window could not be resized) and accessibility. |
+| Browser (Chrome + Claude extension) | dev servers on :8000/:3000, click Run | Browser check (2026-10-12, Chrome via the Claude extension, 1568×760 window, live data): page loads with every request 200; Run completes (POST `/api/optimize` 200, task polls 200); all four cards, the "Feasible 1" chip, real status messages, "P(optimum) 7.1 % vs 3.1 % random" and the backtest render without clipping. Fixed during the check: stale "dimod" label on the SA card, "Continuous relaxation" wording on the SLSQP card, and 10 Recharts `width(-1)` console warnings (pre-existing; `initialDimension` set). After the fixes the console shows no errors or warnings. A follow-up headless-Chrome run (Playwright) at 390 px width found the header stat chips overflowing horizontally; the header now stacks on small screens and the re-run shows no horizontal overflow, no clipped cards and no console errors. Not checked: accessibility. |
 | Live end-to-end (Yahoo Finance, 2026-10-12) | `uvicorn main:app --port 8765`, POST default request, poll | COMPLETED in 10.9 s; weights identical to the snapshot run; 249 backtest rows; unknown task → 404; invalid request → 422. |
 
 The 11 warnings all come from third-party code: Qiskit's `NLocal`/`BlueprintCircuit` deprecations (raised inside
@@ -90,7 +90,7 @@ python -m pytest
 
 ## 6. Limitations
 
-* No frontend unit/component tests. One manual browser check at desktop width (§4); phone widths and accessibility unchecked.
+* No frontend unit/component tests. Browser checks at desktop and 390 px width (§4); accessibility unchecked.
 * The live Yahoo path is covered by a manual smoke test, not by the automated suite (which is deliberately
   offline).
 * Property-based tests cover ≤ 3 assets and R ≤ 3 (≤ 10 qubits) to keep runtime low.
