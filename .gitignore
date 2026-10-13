@@ -8,9 +8,6 @@ venv/
 .mypy_cache/
 .ruff_cache/
 
-# Keep the original-backend bytecode kept as audit evidence
-!audit/original_backend/pyc_evidence/*.pyc
-
 # Env / secrets
 .env
 .env.*
@@ -21,3 +18,7 @@ venv/
 .idea/
 .DS_Store
 Thumbs.db
+
+# AI-assistant instruction files (`next dev` regenerates frontend/AGENTS.md)
+AGENTS.md
+CLAUDE.md

@@ -57,9 +57,9 @@ MAX_EXACT_QUBITS = 24
 MAX_QAOA_QUBITS = 24
 # Enumerate the integer grid to count feasible portfolios only if it is small.
 MAX_ENUMERATION_POINTS = 200_000
-# Exact, noiseless simulation. The original "matrix_product_state" method is
+# Exact, noiseless simulation. The "matrix_product_state" method is
 # also exact here but is a poor fit for all-to-all ZZ cost layers: measured
-# 0.10 s vs 18.2 s per circuit at 18 qubits (AUDIT_NUMERICS.md §5).
+# 0.10 s vs 18.2 s per circuit at 18 qubits.
 AER_METHOD = "statevector"
 
 
@@ -253,8 +253,7 @@ class _NormalizedCostSolver(SamplingMinimumEigensolver):
     2. divide by max|c| so γ is in units where the largest coupling is 1.
        This only reparametrises γ (ground state, sampled bitstrings and
        MinimumEigenOptimizer's selection are unchanged); without it the
-       cost phases wrap and COBYLA's O(1) steps are far too large
-       (AUDIT_NUMERICS.md §5).
+       cost phases wrap and COBYLA's O(1) steps are far too large.
     """
 
     def __init__(self, inner: SamplingMinimumEigensolver, rel_tol: float = 1e-12):

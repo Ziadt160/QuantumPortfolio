@@ -1,7 +1,7 @@
 """
-Mutation check for the regression tests (AUDIT_TESTING.md §3).
+Mutation check for the regression tests.
 
-Copies backend/ to a scratch directory, re-introduces one original defect at a
+Copies backend/ to a scratch directory, re-introduces one known defect at a
 time, and runs the regression test that should catch it.
 
 Usage: python audit/mutate.py <scratch_dir> <python_executable>

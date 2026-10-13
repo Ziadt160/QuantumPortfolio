@@ -73,7 +73,7 @@
   },
   {
     "id": "N7",
-    "claim": "Current QP objective at every integer point (max |\u0394|)",
+    "claim": "QP objective at every integer point (max |\u0394|)",
     "reported": 8.326672684688674e-17,
     "verified": 0.0,
     "abs_err": 8.326672684688674e-17,
@@ -85,30 +85,6 @@
   },
   {
     "id": "N8",
-    "claim": "Original QP objective incl. its CET1/LCR term (max |\u0394|)",
-    "reported": 3.552713678800501e-15,
-    "verified": 0.0,
-    "abs_err": 3.552713678800501e-15,
-    "rel_err": null,
-    "tolerance": "abs \u2264 1e-12",
-    "method": "same formula + 10(c\u00b7w)\u00b2 + 10(l\u00b7w)\u00b2: confirms the original penalty is active at min=0",
-    "status": "PASS",
-    "note": "implemented as written; the formulation itself is the defect (AUDIT_SCIENCE \u00a74.3)"
-  },
-  {
-    "id": "N9",
-    "claim": "Original vacuous Basel penalty on 50% GS (\u03bb[(0.15\u00b70.5)\u00b2+(1.30\u00b70.5)\u00b2])",
-    "reported": 4.281250000000001,
-    "verified": 4.28125,
-    "abs_err": 8.881784197001252e-16,
-    "rel_err": 2.0745773306864238e-16,
-    "tolerance": "abs \u2264 1e-12",
-    "method": "hand calculation",
-    "status": "PASS",
-    "note": "\u2248 65\u00d7 |portfolio objective| (\u22120.0645)"
-  },
-  {
-    "id": "N10",
     "claim": "Number of feasible portfolios (dashboard defaults)",
     "reported": 1.0,
     "verified": 1.0,
@@ -120,7 +96,7 @@
     "note": "feasible x = [{'AAPL': 1, 'GS': 1}]"
   },
   {
-    "id": "N11",
+    "id": "N9",
     "claim": "Qubit count",
     "reported": 9.0,
     "verified": 9.0,
@@ -129,10 +105,10 @@
     "tolerance": "abs \u2264 0",
     "method": "\u03a3_vars bits(ub) + \u03a3_sector bits(slack ub), bits(U)=\u230alog\u2082U\u230b+1",
     "status": "PASS",
-    "note": "original also 9"
+    "note": ""
   },
   {
-    "id": "N12",
+    "id": "N10",
     "claim": "QUBO energy of all 512 bitstrings (max |\u0394|)",
     "reported": 1.5631940186722204e-13,
     "verified": 0.0,
@@ -144,7 +120,7 @@
     "note": "P = 1.39529 (Qiskit auto penalty); decoding disagreements with converter.interpret: 0"
   },
   {
-    "id": "N13",
+    "id": "N11",
     "claim": "Penalty sufficiency: min E(violating) \u2212 min E(satisfying)",
     "reported": 1.3952920874599986,
     "verified": null,
@@ -156,7 +132,7 @@
     "note": ""
   },
   {
-    "id": "N14",
+    "id": "N12",
     "claim": "Ising diagonal + offset vs QUBO energy, little-endian (max |\u0394|)",
     "reported": 7.105427357601002e-14,
     "verified": 0.0,
@@ -168,8 +144,8 @@
     "note": "Hermitian (max |H\u2212H\u2020| coeff 0.0e+00); only I/Z Paulis: True"
   },
   {
-    "id": "N15",
-    "claim": "Exact optimum weights (Exact solver, original & current)",
+    "id": "N13",
+    "claim": "Exact optimum weights (Exact solver)",
     "reported": "{'AAPL': 0.5, 'GS': 0.5}",
     "verified": "{'AAPL': 0.5, 'GS': 0.5}",
     "abs_err": null,
@@ -180,188 +156,8 @@
     "note": ""
   },
   {
-    "id": "N16.o.classical.exp",
-    "claim": "original: classical expected_return",
-    "reported": 0.2317467587783797,
-    "verified": 0.23174675877837972,
-    "abs_err": 2.7755575615628914e-17,
-    "rel_err": 1.1976683411642306e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with sample \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.classical.vol",
-    "claim": "original: classical volatility",
-    "reported": 0.3126436635196803,
-    "verified": 0.3126436635196804,
-    "abs_err": 1.1102230246251565e-16,
-    "rel_err": 3.551081164180606e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with sample \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.classical.sha",
-    "claim": "original: classical sharpe_ratio",
-    "reported": 0.7412488587467939,
-    "verified": 0.7412488587467938,
-    "abs_err": 1.1102230246251565e-16,
-    "rel_err": 1.4977736714524942e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with sample \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.exact.exp",
-    "claim": "original: exact expected_return",
-    "reported": 0.23926793698441767,
-    "verified": 0.23926793698441767,
-    "abs_err": 0.0,
-    "rel_err": 0.0,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.exact.vol",
-    "claim": "original: exact volatility",
-    "reported": 0.3321937211283153,
-    "verified": 0.33219372112831524,
-    "abs_err": 5.551115123125783e-17,
-    "rel_err": 1.671047575574607e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.exact.sha",
-    "claim": "original: exact sharpe_ratio",
-    "reported": 0.7202662836965437,
-    "verified": 0.7202662836965438,
-    "abs_err": 1.1102230246251565e-16,
-    "rel_err": 1.541406351727698e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.exact.por",
-    "claim": "original: exact portfolio_objective",
-    "reported": -0.06445763431367038,
-    "verified": -0.06445763431367041,
-    "abs_err": 2.7755575615628914e-17,
-    "rel_err": 4.3060183500625946e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.sa.exp",
-    "claim": "original: sa expected_return",
-    "reported": 0.23926793698441767,
-    "verified": 0.23926793698441767,
-    "abs_err": 0.0,
-    "rel_err": 0.0,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.sa.vol",
-    "claim": "original: sa volatility",
-    "reported": 0.3321937211283153,
-    "verified": 0.33219372112831524,
-    "abs_err": 5.551115123125783e-17,
-    "rel_err": 1.671047575574607e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.sa.sha",
-    "claim": "original: sa sharpe_ratio",
-    "reported": 0.7202662836965437,
-    "verified": 0.7202662836965438,
-    "abs_err": 1.1102230246251565e-16,
-    "rel_err": 1.541406351727698e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.sa.por",
-    "claim": "original: sa portfolio_objective",
-    "reported": -0.06445763431367038,
-    "verified": -0.06445763431367041,
-    "abs_err": 2.7755575615628914e-17,
-    "rel_err": 4.3060183500625946e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.quantum.exp",
-    "claim": "original: quantum expected_return",
-    "reported": 0.23926793698441767,
-    "verified": 0.23926793698441767,
-    "abs_err": 0.0,
-    "rel_err": 0.0,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.quantum.vol",
-    "claim": "original: quantum volatility",
-    "reported": 0.3321937211283153,
-    "verified": 0.33219372112831524,
-    "abs_err": 5.551115123125783e-17,
-    "rel_err": 1.671047575574607e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.quantum.sha",
-    "claim": "original: quantum sharpe_ratio",
-    "reported": 0.7202662836965437,
-    "verified": 0.7202662836965438,
-    "abs_err": 1.1102230246251565e-16,
-    "rel_err": 1.541406351727698e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.o.quantum.por",
-    "claim": "original: quantum portfolio_objective",
-    "reported": -0.06445763431367038,
-    "verified": -0.06445763431367041,
-    "abs_err": 2.7755575615628914e-17,
-    "rel_err": 4.3060183500625946e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "recomputed from reported weights with factor \u03a3",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N16.c.classical.exp",
-    "claim": "current: classical expected_return",
+    "id": "N14.classical.exp",
+    "claim": "classical expected_return",
     "reported": 0.23174675881356638,
     "verified": 0.23174675881356638,
     "abs_err": 0.0,
@@ -372,8 +168,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.classical.vol",
-    "claim": "current: classical volatility",
+    "id": "N14.classical.vol",
+    "claim": "classical volatility",
     "reported": 0.3181376469493845,
     "verified": 0.3181376469493845,
     "abs_err": 0.0,
@@ -384,8 +180,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.classical.sha",
-    "claim": "current: classical sharpe_ratio",
+    "id": "N14.classical.sha",
+    "claim": "classical sharpe_ratio",
     "reported": 0.7284480822555311,
     "verified": 0.7284480822555311,
     "abs_err": 0.0,
@@ -396,8 +192,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.classical.por",
-    "claim": "current: classical portfolio_objective",
+    "id": "N14.classical.por",
+    "claim": "classical portfolio_objective",
     "reported": -0.06526759820353759,
     "verified": -0.06526759820353757,
     "abs_err": 1.3877787807814457e-17,
@@ -408,8 +204,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.exact.exp",
-    "claim": "current: exact expected_return",
+    "id": "N14.exact.exp",
+    "claim": "exact expected_return",
     "reported": 0.23926793698441767,
     "verified": 0.23926793698441767,
     "abs_err": 0.0,
@@ -420,8 +216,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.exact.vol",
-    "claim": "current: exact volatility",
+    "id": "N14.exact.vol",
+    "claim": "exact volatility",
     "reported": 0.3321937211283152,
     "verified": 0.33219372112831524,
     "abs_err": 5.551115123125783e-17,
@@ -432,8 +228,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.exact.sha",
-    "claim": "current: exact sharpe_ratio",
+    "id": "N14.exact.sha",
+    "claim": "exact sharpe_ratio",
     "reported": 0.720266283696544,
     "verified": 0.7202662836965438,
     "abs_err": 2.220446049250313e-16,
@@ -444,8 +240,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.exact.por",
-    "claim": "current: exact portfolio_objective",
+    "id": "N14.exact.por",
+    "claim": "exact portfolio_objective",
     "reported": -0.06445763431367041,
     "verified": -0.06445763431367041,
     "abs_err": 0.0,
@@ -456,8 +252,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.sa.exp",
-    "claim": "current: sa expected_return",
+    "id": "N14.sa.exp",
+    "claim": "sa expected_return",
     "reported": 0.23926793698441767,
     "verified": 0.23926793698441767,
     "abs_err": 0.0,
@@ -468,8 +264,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.sa.vol",
-    "claim": "current: sa volatility",
+    "id": "N14.sa.vol",
+    "claim": "sa volatility",
     "reported": 0.3321937211283152,
     "verified": 0.33219372112831524,
     "abs_err": 5.551115123125783e-17,
@@ -480,8 +276,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.sa.sha",
-    "claim": "current: sa sharpe_ratio",
+    "id": "N14.sa.sha",
+    "claim": "sa sharpe_ratio",
     "reported": 0.720266283696544,
     "verified": 0.7202662836965438,
     "abs_err": 2.220446049250313e-16,
@@ -492,8 +288,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.sa.por",
-    "claim": "current: sa portfolio_objective",
+    "id": "N14.sa.por",
+    "claim": "sa portfolio_objective",
     "reported": -0.06445763431367041,
     "verified": -0.06445763431367041,
     "abs_err": 0.0,
@@ -504,8 +300,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.quantum.exp",
-    "claim": "current: quantum expected_return",
+    "id": "N14.quantum.exp",
+    "claim": "quantum expected_return",
     "reported": 0.23926793698441767,
     "verified": 0.23926793698441767,
     "abs_err": 0.0,
@@ -516,8 +312,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.quantum.vol",
-    "claim": "current: quantum volatility",
+    "id": "N14.quantum.vol",
+    "claim": "quantum volatility",
     "reported": 0.3321937211283152,
     "verified": 0.33219372112831524,
     "abs_err": 5.551115123125783e-17,
@@ -528,8 +324,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.quantum.sha",
-    "claim": "current: quantum sharpe_ratio",
+    "id": "N14.quantum.sha",
+    "claim": "quantum sharpe_ratio",
     "reported": 0.720266283696544,
     "verified": 0.7202662836965438,
     "abs_err": 2.220446049250313e-16,
@@ -540,8 +336,8 @@
     "note": ""
   },
   {
-    "id": "N16.c.quantum.por",
-    "claim": "current: quantum portfolio_objective",
+    "id": "N14.quantum.por",
+    "claim": "quantum portfolio_objective",
     "reported": -0.06445763431367041,
     "verified": -0.06445763431367041,
     "abs_err": 0.0,
@@ -552,32 +348,8 @@
     "note": ""
   },
   {
-    "id": "N17",
-    "claim": "original: SA qubo_energy at x=(AAPL,GS)",
-    "reported": 4.216792365685251,
-    "verified": 4.21679236568633,
-    "abs_err": 1.0791367799356522e-12,
-    "rel_err": 2.5591413718090683e-13,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "objective + 10(c\u00b7w)\u00b2 + 10(l\u00b7w)\u00b2, feasible \u21d2 zero constraint penalty",
-    "status": "PASS",
-    "note": "value is dominated by the vacuous Basel penalty (4.28 of 4.22)"
-  },
-  {
-    "id": "N18",
-    "claim": "original: QAOA qubo_fval",
-    "reported": 4.216792365686331,
-    "verified": 4.21679236568633,
-    "abs_err": 8.881784197001252e-16,
-    "rel_err": 2.106289194904583e-16,
-    "tolerance": "rel \u2264 1e-09",
-    "method": "same; note this is the QP objective (incl. soft penalty), not a QUBO energy",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N19",
-    "claim": "current: SA qubo_energy",
+    "id": "N15",
+    "claim": "SA qubo_energy",
     "reported": -0.06445763431366913,
     "verified": -0.06445763431367041,
     "abs_err": 1.27675647831893e-15,
@@ -588,32 +360,8 @@
     "note": ""
   },
   {
-    "id": "N20.o",
-    "claim": "original: SLSQP objective vs trust-constr (one-sided)",
-    "reported": -0.06700034921968628,
-    "verified": -0.06700030195477455,
-    "abs_err": 4.7264911734457016e-08,
-    "rel_err": 7.054432645148525e-07,
-    "tolerance": "abs \u2264 1e-07",
-    "method": "scipy trust-constr (interior point), same constraints; accept f_SLSQP \u2212 f_ref \u2264 1e-7 and primal residual \u2264 1e-6",
-    "status": "PASS",
-    "note": "f_SLSQP \u2212 f_ref = -4.7e-08; primal residual 2.7e-10; max |\u0394w| = 9.8e-06"
-  },
-  {
-    "id": "N21.o",
-    "claim": "original: SLSQP KKT stationarity residual (relative)",
-    "reported": 3.4078991020510914e-16,
-    "verified": 0.0,
-    "abs_err": 3.4078991020510914e-16,
-    "rel_err": null,
-    "tolerance": "abs \u2264 1e-06",
-    "method": "\u2016\u2207f + \u03a3\u03bb\u2207g_active\u2016/\u2016\u2207f\u2016 with \u03bb_ineq \u2265 0 (lsq_linear)",
-    "status": "PASS",
-    "note": ""
-  },
-  {
-    "id": "N20.c",
-    "claim": "current: SLSQP objective vs trust-constr (one-sided)",
+    "id": "N16",
+    "claim": "SLSQP objective vs trust-constr (one-sided)",
     "reported": -0.06526759820353757,
     "verified": -0.06526744416010141,
     "abs_err": 1.5404343615965654e-07,
@@ -624,8 +372,8 @@
     "note": "f_SLSQP \u2212 f_ref = -1.5e-07; primal residual 7.4e-10; max |\u0394w| = 1.4e-05"
   },
   {
-    "id": "N21.c",
-    "claim": "current: SLSQP KKT stationarity residual (relative)",
+    "id": "N17",
+    "claim": "SLSQP KKT stationarity residual (relative)",
     "reported": 4.050328838181957e-16,
     "verified": 0.0,
     "abs_err": 4.050328838181957e-16,
@@ -636,8 +384,8 @@
     "note": ""
   },
   {
-    "id": "N22.o",
-    "claim": "original: backtest cumulative returns, all dates & strategies (max |\u0394|)",
+    "id": "N18",
+    "claim": "Backtest cumulative returns, all dates & strategies (max |\u0394|)",
     "reported": 0.0,
     "verified": 0.0,
     "abs_err": 0.0,
@@ -648,20 +396,8 @@
     "note": "249 dates; final: {'SLSQP': '+0.3444 (buy-and-hold +0.3464)', 'Exact': '+0.3461 (buy-and-hold +0.3488)', 'SA': '+0.3461 (buy-and-hold +0.3488)', 'QAOA': '+0.3461 (buy-and-hold +0.3488)'}"
   },
   {
-    "id": "N22.c",
-    "claim": "current: backtest cumulative returns, all dates & strategies (max |\u0394|)",
-    "reported": 0.0,
-    "verified": 0.0,
-    "abs_err": 0.0,
-    "rel_err": null,
-    "tolerance": "abs \u2264 1e-12",
-    "method": "np.cumprod(1+R_oos\u00b7w)\u22121 (constant-mix)",
-    "status": "PASS",
-    "note": "249 dates; final: {'SLSQP': '+0.3444 (buy-and-hold +0.3464)', 'Exact': '+0.3461 (buy-and-hold +0.3488)', 'SA': '+0.3461 (buy-and-hold +0.3488)', 'QAOA': '+0.3461 (buy-and-hold +0.3488)'}"
-  },
-  {
-    "id": "N23",
-    "claim": "current: QAOA gap_to_optimal_pct",
+    "id": "N19",
+    "claim": "QAOA gap_to_optimal_pct",
     "reported": 0.0,
     "verified": 0.0,
     "abs_err": 0.0,
@@ -672,7 +408,7 @@
     "note": ""
   },
   {
-    "id": "N24",
+    "id": "N20",
     "claim": "Qiskit QAOA parameter order",
     "reported": "\u03b2[0], \u03b2[1], \u03b2[2], \u03b3[0], \u03b3[1], \u03b3[2]",
     "verified": "\u03b2[0..p-1], \u03b3[0..p-1] (block)",
@@ -684,20 +420,8 @@
     "note": ""
   },
   {
-    "id": "N25.o",
-    "claim": "original: init is a TQA linear ramp (Sack & Serbyn Eq. 6) in Qiskit's convention",
-    "reported": "\u03b2=[0.5625, 0.1875, 0.375], \u03b3=[0.375, 0.1875, 0.5625]",
-    "verified": "\u03b2\u22640, |\u03b2|\u2193, \u03b3\u2191, \u27e8H\u27e9 < uniform",
-    "abs_err": null,
-    "rel_err": null,
-    "tolerance": "n/a",
-    "method": "values as bound in Qiskit's block order; \u27e8H\u27e9 by NumPy statevector",
-    "status": "FAIL",
-    "note": "raw H: \u27e8H\u27e9 at init +9.908 vs uniform +0.000"
-  },
-  {
-    "id": "N25.c",
-    "claim": "current: init is a TQA linear ramp (Sack & Serbyn Eq. 6) in Qiskit's convention",
+    "id": "N21",
+    "claim": "Initial point is a TQA linear ramp (Sack & Serbyn Eq. 6) in Qiskit's convention",
     "reported": "\u03b2=[-0.5625, -0.375, -0.1875], \u03b3=[0.1875, 0.375, 0.5625]",
     "verified": "\u03b2\u22640, |\u03b2|\u2193, \u03b3\u2191, \u27e8H\u27e9 < uniform",
     "abs_err": null,
@@ -708,7 +432,7 @@
     "note": "H/max|c| (max|c| = 25.1): \u27e8H\u27e9 at init -1.468 vs uniform +0.000"
   },
   {
-    "id": "N26",
+    "id": "N22",
     "claim": "QAOA state probabilities: NumPy vs Qiskit Statevector (max |\u0394p|)",
     "reported": 4.926614671774132e-16,
     "verified": 0.0,
@@ -720,8 +444,8 @@
     "note": "\u03a3p = 0.999999999999999; \u2016\u03c8\u2016 \u2212 1 = 4.4e-16"
   },
   {
-    "id": "N27",
-    "claim": "current: p_optimal from 1024 Aer shots vs exact |\u03c8|\u00b2 at reported \u03b8*",
+    "id": "N23",
+    "claim": "p_optimal from 1024 Aer shots vs exact |\u03c8|\u00b2 at reported \u03b8*",
     "reported": 0.0712890625,
     "verified": 0.0783817624126451,
     "abs_err": 0.007092699912645106,
@@ -732,7 +456,7 @@
     "note": "\u03c3 = 0.0084, z = -0.84"
   },
   {
-    "id": "N28",
+    "id": "N24",
     "claim": "uniform_p_optimal (random guessing)",
     "reported": 0.03125,
     "verified": 0.03125,
@@ -744,20 +468,8 @@
     "note": ""
   },
   {
-    "id": "N29.orig",
-    "claim": "P(x*) of the QAOA state at the original init",
-    "reported": 0.015930495532785076,
-    "verified": 0.03125,
-    "abs_err": 0.015319504467214924,
-    "rel_err": 0.4902241429508776,
-    "tolerance": "n/a",
-    "method": "NumPy statevector; verified value column = uniform baseline",
-    "status": "INFO",
-    "note": ""
-  },
-  {
-    "id": "N29.curr",
-    "claim": "P(x*) of the QAOA state at the current (corrected) init",
+    "id": "N25",
+    "claim": "P(x*) of the QAOA state at the initial point",
     "reported": 0.07278506075806762,
     "verified": 0.03125,
     "abs_err": 0.04153506075806762,
@@ -768,7 +480,7 @@
     "note": ""
   },
   {
-    "id": "N30",
+    "id": "N26",
     "claim": "P(x*) of the QAOA state at optimised \u03b8* (exact)",
     "reported": 0.0783817624126451,
     "verified": 0.03125,
@@ -780,7 +492,7 @@
     "note": "ratio to uniform = 2.51\u00d7"
   },
   {
-    "id": "N31",
+    "id": "N27",
     "claim": "Null model: P(best-feasible-of-1024 uniform samples = x*)",
     "reported": 1.0,
     "verified": 0.9999999999999925,
@@ -792,7 +504,7 @@
     "note": "1 \u2212 P = 7.60e-15: random sampling 'finds' x* essentially always"
   },
   {
-    "id": "N32",
+    "id": "N28",
     "claim": "QAOA: P(x* appears in the final 1024-shot histogram)",
     "reported": 1.0,
     "verified": 0.9999999999999925,
@@ -804,7 +516,7 @@
     "note": ""
   },
   {
-    "id": "N34",
+    "id": "N29",
     "claim": "CVaR_\u03b1 aggregation (200 random discrete distributions, max |\u0394|)",
     "reported": 4.907395291464667e-06,
     "verified": 0.0,
@@ -816,15 +528,15 @@
     "note": "tolerance set by the quadrature, not by the library"
   },
   {
-    "id": "N33",
+    "id": "N30",
     "claim": "Wall-clock: exhaustive NumPy evaluation of all 512 QUBO energies [s]",
     "reported": 0.02064824104309082,
-    "verified": 0.00030246500158682466,
-    "abs_err": 0.020345776041503994,
-    "rel_err": 67.26654632689329,
+    "verified": 0.0005274809990078211,
+    "abs_err": 0.020120760044083,
+    "rel_err": 38.14499495134357,
     "tolerance": "n/a",
-    "method": "vectorised einsum; reported column = Exact solver time, current run",
+    "method": "vectorised einsum; reported column = Exact solver time",
     "status": "INFO",
-    "note": "QAOA: 2.60s for 53 evaluations \u00d7 1024 shots; SA 0.031s; original SA (dimod reference) 5.13s"
+    "note": "QAOA: 2.60s for 53 evaluations \u00d7 1024 shots; SA 0.031s"
   }
 ]

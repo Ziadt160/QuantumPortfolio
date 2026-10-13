@@ -7,11 +7,6 @@ The only thing patched is `quant_engine.fetch_universe_data`, which is replaced
 by a reader of the frozen CSV snapshot so that runs are reproducible (Yahoo
 adjusted prices are revised retroactively, so live fetches are not).
 
-  --code current   : backend/ (the audited, fixed code)
-  --code original  : audit/original_backend/ (the code as found; needs a
-                     qiskit-algorithms 0.3.x / V1-primitive environment such as
-                     the author's backend/.venv — see AUDIT_NUMERICS.md)
-
 Usage (from the repository root):
     python audit/run_pipeline_snapshot.py --out audit/results/pipeline_default.json
     python audit/run_pipeline_snapshot.py --request '{"budget_resolution": 4}' --out ...
@@ -29,7 +24,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "audit" / "data"
-CODE_DIRS = {"current": ROOT / "backend", "original": ROOT / "audit" / "original_backend"}
+BACKEND = ROOT / "backend"
 
 # The request the dashboard sends with its initial slider values
 # (frontend/src/app/Dashboard.tsx). qaoa_* / sa_* fields are not sent by the
@@ -68,9 +63,9 @@ def snapshot_fetch(tickers, start_date, end_date):
     return frame.loc[(frame.index >= start_date) & (frame.index < end_date), cols].copy()
 
 
-def import_backend(code: str = "current"):
-    """Import (quant_engine, quantum_engine, main) from the chosen code directory."""
-    sys.path.insert(0, str(CODE_DIRS[code]))
+def import_backend():
+    """Import (quant_engine, quantum_engine, main) from backend/ with the snapshot data source."""
+    sys.path.insert(0, str(BACKEND))
     qe = importlib.import_module("quant_engine")
     qm = importlib.import_module("quantum_engine")
     mn = importlib.import_module("main")
@@ -88,16 +83,15 @@ def _json_default(o):
 def main_cli() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--request", default="{}", help="JSON overrides of the default request")
-    ap.add_argument("--code", choices=sorted(CODE_DIRS), default="current")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
-    _, _, mn = import_backend(args.code)
+    _, _, mn = import_backend()
     req = mn.OptimizationRequest(**{**DASHBOARD_DEFAULT_REQUEST, **json.loads(args.request)})
     payload = req.model_dump() if hasattr(req, "model_dump") else req.dict()
     t0 = time.time()
     result = mn.run_optimization_task_logic(payload)
-    result["_audit"] = {"code": args.code, "request": payload, "wall_sec": time.time() - t0,
+    result["_audit"] = {"request": payload, "wall_sec": time.time() - t0,
                         "python": sys.version.split()[0]}
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(json.dumps(result, indent=2, default=_json_default), encoding="utf-8")

@@ -29,7 +29,7 @@ def test_linear_ramp_anneals_towards_the_minimum(model):
     """Regression: with Qiskit's +ΣX mixer, positive β anneals to the *maximum* of H_C.
 
     The TQA start must have lower ⟨H_C⟩ than the uniform superposition; the
-    original sign/scale gives higher energy than uniform.
+    positive-β convention gives higher energy than uniform.
     """
     from qiskit_optimization.converters import QuadraticProgramToQubo
     qp = qm._build_quadratic_program(mu=model["mu"], B=model["B"], F=model["F"], D=model["D"],

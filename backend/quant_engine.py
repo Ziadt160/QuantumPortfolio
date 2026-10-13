@@ -104,7 +104,7 @@ def generate_statistical_factor_model(prices: pd.DataFrame, num_factors: int = 3
 # of 0 so the >= constraints push the optimizer toward a minimum bank
 # allocation.
 #
-# Caveats (see AUDIT_SCIENCE.md): CET1 and LCR are bank-level regulatory
+# Caveats: CET1 and LCR are bank-level regulatory
 # ratios. Basel III does not require an *investor's* portfolio-weighted
 # average of investee banks' ratios to exceed a floor, so the CET1/LCR
 # constraints here are a stylised device, not regulation. "Duration" for an

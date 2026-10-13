@@ -1,7 +1,7 @@
-# Runtime dependencies, pinned to the versions the audit tested (see AUDIT_TESTING.md).
+# Runtime dependencies, pinned to the tested versions (full lock: requirements-lock.txt).
 # Tested on CPython 3.11 and 3.13 (Windows 11).
 # qiskit-algorithms is intentionally absent: its 0.4 release dropped V1-primitive
-# support and broke the original code; QAOA now comes from qiskit-optimization.
+# support; QAOA comes from qiskit-optimization instead.
 fastapi==0.143.0
 pydantic==2.14.1
 uvicorn==0.54.0

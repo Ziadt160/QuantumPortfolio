@@ -43,7 +43,7 @@ claim is stated with its limits. See [Results](#results) and [Limitations](#limi
   random-sampling null model, not only by whether it "found" the answer.
 - **Literature-faithful QAOA:** CVaR aggregation (Barkoutsos et al., 2020) and a linear-ramp/TQA start
   (Sack & Serbyn, 2021), adapted to Qiskit's mixer sign convention and Hamiltonian scale.
-- **Verified numerics:** 69 independent checks (QUBO energies for every bitstring, Ising endianness, statevector
+- **Verified numerics:** 45 independent checks (QUBO energies for every bitstring, Ising endianness, statevector
   agreement, KKT optimality, CVaR, backtest arithmetic). 50 automated tests including property-based tests;
   a mutation check confirms the regression tests catch the defects they guard.
 - **Reproducible:** exact dependency pins plus a full lock file, tested clean installs on Python 3.11 and 3.13,
@@ -53,7 +53,7 @@ claim is stated with its limits. See [Results](#results) and [Limitations](#limi
 
 ## Results
 
-Default dashboard settings, frozen 2020–2022 data snapshot ([AUDIT_NUMERICS.md](AUDIT_NUMERICS.md)):
+Default dashboard settings, frozen 2020–2022 data snapshot ([`audit/data/`](audit/data)):
 
 | Solver | Portfolio | Return | Volatility | Time |
 |---|---|---|---|---|
@@ -62,7 +62,7 @@ Default dashboard settings, frozen 2020–2022 data snapshot ([AUDIT_NUMERICS.md
 | Simulated annealing | AAPL 50 %, GS 50 % | 23.93 % | 33.22 % | 0.03 s |
 | CVaR-QAOA (p = 3, 9 qubits) | AAPL 50 %, GS 50 % | 23.93 % | 33.22 % | 2.6 s |
 
-Repeated trials ([AUDIT_NUMERICS.md §4](AUDIT_NUMERICS.md#4-stochastic-behaviour-of-qaoa-repeated-trials)):
+Repeated trials ([`audit/results/qaoa_study_summary.md`](audit/results/qaoa_study_summary.md)):
 
 | Problem size | QAOA found optimum | Random sampling would find it | QAOA probability on the optimum vs random guessing |
 |---|---|---|---|
@@ -209,9 +209,9 @@ the effective discretised constraints. The interactive schema is at `/docs`.
 | Layer | What it covers | Command |
 |---|---|---|
 | Unit and property-based tests | Moments, factor model, QP objective at every grid point, QUBO/Ising energies for every bitstring, QAOA state vs an independent NumPy simulation, unitarity, CVaR, API validation | `cd backend && python -m pytest` |
-| Independent numerical audit | 69 checks against reference implementations on a frozen data snapshot | `python audit/verify_numerics.py` |
+| Independent numerical audit | 45 checks against reference implementations on a frozen data snapshot | `python audit/verify_numerics.py` |
 | Stochastic study | Repeated QAOA trials with confidence intervals vs SA and a null model | `python audit/qaoa_study.py` (see below) |
-| Mutation check | Re-introduces each fixed defect and confirms its test fails (7/7) | `python audit/mutate.py <dir> <python>` |
+| Mutation check | Re-introduces each guarded defect and confirms its test fails (7/7) | `python audit/mutate.py <dir> <python>` |
 | Frontend | Type-check, lint, production build, browser run | `npx tsc --noEmit`, `npm run lint`, `npm run build` |
 | Continuous integration | Every push and pull request: backend tests on Python 3.11 and 3.13 (Linux), frontend type-check/lint/build, dependency audit | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 
@@ -221,27 +221,21 @@ the effective discretised constraints. The interactive schema is at `/docs`.
 From the repository root, with the backend environment active:
 
 ```bash
-python audit/run_pipeline_snapshot.py --code current --out audit/results/current_pipeline_default.json
+python audit/run_pipeline_snapshot.py --out audit/results/current_pipeline_default.json
 python audit/verify_numerics.py
 python audit/qaoa_study.py --configs C1,C2 --seeds 20 --out audit/results/qaoa_study_9q.jsonl
 python audit/qaoa_study.py --configs C3 --seeds 10 --out audit/results/qaoa_study_18q.jsonl
 python audit/analyze_qaoa_study.py audit/results/qaoa_study_9q.jsonl audit/results/qaoa_study_18q.jsonl
 ```
 
-`audit/data/` holds the frozen price snapshot (SHA-256 hashes in AUDIT_NUMERICS.md). `audit/original_backend/` is
-the code before the audit, preserved byte-exact; it needs `qiskit-algorithms` 0.3.x to run.
+`audit/data/` holds the frozen price snapshot (Yahoo Finance adjusted closes, downloaded 2026-10-12):
+
+| File | SHA-256 |
+|---|---|
+| `prices_insample.csv` (2020-01-02 → 2022-12-30) | `bd91368a5961db0cbb0dfd245237147b079a18180c29f8e73fa6bfcb984211a2` |
+| `prices_oos.csv` (2023-01-03 → 2023-12-29) | `097ab0d668c8097675acc4f2fdaf051eee09e3c19442aee89960c6405327a23e` |
 
 </details>
-
-The full audit is documented in eight reports: start with **[AUDIT_SUMMARY.md](AUDIT_SUMMARY.md)**.
-
-| Report | Content |
-|---|---|
-| [AUDIT_SCIENCE.md](AUDIT_SCIENCE.md) | Mathematical formulation, claims and verdicts, quantum-specific checks |
-| [AUDIT_NUMERICS.md](AUDIT_NUMERICS.md) | Independent recomputation of every reported number; repeated-trial study |
-| [AUDIT_CORRECTNESS.md](AUDIT_CORRECTNESS.md) | Defects found, with location, impact, reproduction and fix |
-| [AUDIT_TESTING.md](AUDIT_TESTING.md) | Test suite, mutation check, clean-install runs |
-| [AUDIT_REPOSITORY.md](AUDIT_REPOSITORY.md), [AUDIT_CODE_QUALITY.md](AUDIT_CODE_QUALITY.md), [AUDIT_PRODUCTION.md](AUDIT_PRODUCTION.md) | Architecture, code quality, security and operational readiness |
 
 ## Project structure
 
@@ -255,9 +249,8 @@ QuantumPortfolio/
 │   └── requirements*.txt     Exact pins, dev tools, full lock file
 ├── frontend/
 │   └── src/app/Dashboard.tsx Interactive dashboard (Next.js 16, Recharts, Tailwind)
-├── audit/                    Verification scripts, frozen data snapshot, results, original code
-├── docs/images/              Screenshots
-└── AUDIT_*.md                Audit reports
+├── audit/                    Verification scripts, frozen data snapshot, results
+└── docs/images/              Screenshots
 ```
 
 ## Limitations
@@ -270,7 +263,7 @@ QuantumPortfolio/
 - **Stylised constraints.** CET1/LCR floors are portfolio-weighted bank ratios, a modelling device rather than a
   Basel III requirement on investors. Duration and bank-ratio values are illustrative constants.
 - **Local demo.** In-memory task store, no authentication or rate limiting. Suitable for a single local user,
-  not as a public service ([AUDIT_PRODUCTION.md](AUDIT_PRODUCTION.md)).
+  not as a public service.
 
 ## Roadmap
 
